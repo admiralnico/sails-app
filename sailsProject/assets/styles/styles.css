@@ -22,3 +22,13 @@ background-repeat: no-repeat;
 background-position: center;
 margin: -102px 0 0 -102px;
 }
+
+#intro-content{
+	background-color: #EEE;
+	color: #999999;
+	opacity:0.95;	
+	padding:10px;
+	border-radius: 5px;
+	-webkit-border-radius:5px;
+	-moz-border-radius:5px;
+}

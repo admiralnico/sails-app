@@ -10,128 +10,59 @@ $(window).scroll(function() {
 //jQuery for page scrolling feature - requires jQuery Easing plugin
 $(function() {
     $('.page-scroll a').bind('click', function(event) {
+        var disabler = new UserScrollDisabler();
+        disabler.disable_scrolling();
         var $anchor = $(this);
         $('html, body').stop().animate({
             scrollTop: $($anchor.attr('href')).offset().top
-        }, 1500, 'easeInOutExpo');
+        }, 1500, 'easeInOutExpo', function(){
+             disabler.enable_scrolling();
+        });
+       
         event.preventDefault();
     });
+
+    
 });
 
-//Google Map Skin - Get more at http://snazzymaps.com/
-// var myOptions = {
-//     zoom: 15,
-//     center: new google.maps.LatLng(53.385873, -1.471471),
-//     mapTypeId: google.maps.MapTypeId.ROADMAP,
-//     disableDefaultUI: true,
-//     styles: [{
-//         "featureType": "water",
-//         "elementType": "geometry",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 17
-//         }]
-//     }, {
-//         "featureType": "landscape",
-//         "elementType": "geometry",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 20
-//         }]
-//     }, {
-//         "featureType": "road.highway",
-//         "elementType": "geometry.fill",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 17
-//         }]
-//     }, {
-//         "featureType": "road.highway",
-//         "elementType": "geometry.stroke",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 29
-//         }, {
-//             "weight": 0.2
-//         }]
-//     }, {
-//         "featureType": "road.arterial",
-//         "elementType": "geometry",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 18
-//         }]
-//     }, {
-//         "featureType": "road.local",
-//         "elementType": "geometry",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 16
-//         }]
-//     }, {
-//         "featureType": "poi",
-//         "elementType": "geometry",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 21
-//         }]
-//     }, {
-//         "elementType": "labels.text.stroke",
-//         "stylers": [{
-//             "visibility": "on"
-//         }, {
-//             "color": "#000000"
-//         }, {
-//             "lightness": 16
-//         }]
-//     }, {
-//         "elementType": "labels.text.fill",
-//         "stylers": [{
-//             "saturation": 36
-//         }, {
-//             "color": "#000000"
-//         }, {
-//             "lightness": 40
-//         }]
-//     }, {
-//         "elementType": "labels.icon",
-//         "stylers": [{
-//             "visibility": "off"
-//         }]
-//     }, {
-//         "featureType": "transit",
-//         "elementType": "geometry",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 19
-//         }]
-//     }, {
-//         "featureType": "administrative",
-//         "elementType": "geometry.fill",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 20
-//         }]
-//     }, {
-//         "featureType": "administrative",
-//         "elementType": "geometry.stroke",
-//         "stylers": [{
-//             "color": "#000000"
-//         }, {
-//             "lightness": 17
-//         }, {
-//             "weight": 1.2
-//         }]
-//     }]
-// };
+//Disable scrolling while page animation
+var UserScrollDisabler = function() {
 
-// var map = new google.maps.Map(document.getElementById('map'), myOptions);
+    // spacebar: 32, pageup: 33, pagedown: 34, end: 35, home: 36
+    // left: 37, up: 38, right: 39, down: 40
+    this.scrollEventKeys = [32, 33, 34, 35, 36, 37, 38, 39, 40];
+    this.$window = $(window);
+    this.$document = $(document);
+
+};
+UserScrollDisabler.prototype = {
+
+    disable_scrolling : function() {
+        var t = this;
+        t.$window.on("mousewheel.UserScrollDisabler DOMMouseScroll.UserScrollDisabler", this._handleWheel);
+        t.$document.on("mousewheel.UserScrollDisabler touchmove.UserScrollDisabler", this._handleWheel);
+        t.$document.on("keydown.UserScrollDisabler", function(event) {
+            t._handleKeydown.call(t, event);
+        });
+    },
+
+    enable_scrolling : function() {
+        var t = this;
+        t.$window.off(".UserScrollDisabler");
+        t.$document.off(".UserScrollDisabler");
+    },
+
+    _handleKeydown : function(event) {
+        for (var i = 0; i < this.scrollEventKeys.length; i++) {
+            if (event.keyCode === this.scrollEventKeys[i]) {
+                event.preventDefault();
+                return;
+            }
+        }
+    },
+
+    _handleWheel : function(event) {
+        event.preventDefault();
+    }
+
+};
